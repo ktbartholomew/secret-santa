@@ -1,0 +1,9 @@
+.btn-primary {
+  background: $christmas-red;
+  border-color: shade($christmas-red, 10%);
+
+  &:hover, &:focus {
+    background: shade($christmas-red, 10%);
+    border-color: shade($christmas-red, 10%);
+  }
+}
