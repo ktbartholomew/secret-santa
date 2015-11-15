@@ -15,12 +15,15 @@ angular.module(moduleName, [
 
   this.addLikes = function () {
     this.saveInProgress = true;
-    
+
     $game.addLikes(game.id, {
       likes: this.likes,
       dislikes: this.dislikes
     })
     .then(function () {
+      this.saveInProgress = false;
+    }.bind(this))
+    .catch(function () {
       this.saveInProgress = false;
     }.bind(this));
   };

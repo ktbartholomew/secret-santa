@@ -1,6 +1,7 @@
 var MongoClient = require('mongodb').MongoClient;
 var Q = require('q');
 var util = require('util');
+var log = require('../log');
 
 var connection;
 
@@ -36,6 +37,33 @@ var insert = function (document) {
   });
 };
 
+var find = function (query) {
+  return connect().then(function (db) {
+    var collection = db.collection('games');
+    return Q.ninvoke(collection, 'find', query);
+  })
+  .then(function (cursor) {
+    return Q.ninvoke(cursor, 'toArray');
+  });
+};
+
+var findOne = function (query) {
+  return find(query)
+  .then(function (results) {
+    return Q.resolve(results[0]);
+  });
+};
+
+var update = function (query, data) {
+  return connect().then(function (db) {
+    var collection = db.collection('games');
+    return Q.ninvoke(collection, 'update', query, data);
+  });
+};
+
 module.exports = {
-  insert: insert
+  insert: insert,
+  find: find,
+  findOne: findOne,
+  update: update
 };

@@ -1,3 +1,4 @@
+var util = require('util');
 var express = require('express');
 var log = require('./log');
 var bodyParser = require('body-parser');
@@ -24,16 +25,13 @@ var getCurrentUser = function (token) {
 };
 
 var getGameForUser = function (gameId, userId) {
-  log.debug(arguments);
-  return Q.Promise(function (resolve, reject) {
-    var game;
+  return games.findOne({id: gameId})
+  .then(function (game) {
+    if(!game) {
+      return Q.reject();
+    }
 
-    if (_.find(games, {id: gameId})) {
-      game = _.cloneDeep(_.find(games, {id: gameId}));
-    }
-    else {
-      return reject();
-    }
+    delete game._id;
 
     _.map(game.participants, function (participant) {
       if(participant.id !== userId) {
@@ -43,20 +41,20 @@ var getGameForUser = function (gameId, userId) {
       return participant;
     });
 
-    return resolve(game);
+    return Q.resolve(game);
   });
 };
 
 app.get('/api/games/:gameId', function (req, res) {
   return getCurrentUser(req.get('X-Access-Token'))
   .then(function (user) {
-    log.debug(user);
     return getGameForUser(req.params.gameId, user.id);
   })
   .then(function (game) {
     res.send(game);
   })
   .catch(function (error) {
+    log.error(error);
     res.status(404);
     res.end();
   });
@@ -64,6 +62,7 @@ app.get('/api/games/:gameId', function (req, res) {
 
 app.post('/api/games', bodyParser.json(), function (req, res) {
   var crypto = require('crypto');
+  var game;
 
   return getCurrentUser(req.get('X-Access-Token'))
   .then(function (user) {
@@ -78,11 +77,12 @@ app.post('/api/games', bodyParser.json(), function (req, res) {
 
     return scramble(req.body);
   })
-  .then(function (game) {
-    return games.insert(game);
+  .then(function (scrambled) {
+    game = scrambled;
+    return games.insert(scrambled);
   })
-  .then(function (result) {
-    res.send(result);
+  .then(function () {
+    res.send({id: game.id});
   })
   .catch(function (error) {
     res.send(error);
@@ -90,29 +90,35 @@ app.post('/api/games', bodyParser.json(), function (req, res) {
 });
 
 app.put('/api/games/:gameId/likes', bodyParser.json(), function (req, res) {
+  var currentUser;
+
   return getCurrentUser(req.get('X-Access-Token'))
   .then(function (user) {
-    var game = _.find(games, {id: req.params.gameId});
+    currentUser = user;
+    return games.findOne({id: req.params.gameId});
+  })
+  .then(function (game) {
+    var participantIndex = _.findIndex(game.participants, {id: currentUser.id});
+    var $set = {};
+    var likesKey = util.format('participants.%s.santa.likes', participantIndex);
+    var dislikesKey = util.format('participants.%s.santa.dislikes', participantIndex);
 
-    _.map(game.participants, function (participant) {
-      if(participant.id !== user.id) {
-        return participant;
-      }
+    $set[likesKey] = req.body.likes;
+    $set[dislikesKey] = req.body.dislikes;
 
-      participant.santa.likes = req.body.likes;
-      participant.santa.dislikes = req.body.dislikes;
-
-      return participant;
+    return games.update({id: game.id}, {
+      $set: $set
     });
-
-    return getGameForUser(req.params.gameId, user.id);
+  })
+  .then(function () {
+    return getGameForUser(req.params.gameId, currentUser.id);
   })
   .then(function (game) {
     res.send(game);
   })
   .catch(function (error) {
     res.status(404);
-    res.end();
+    res.send(error);
   });
 });
 
