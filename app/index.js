@@ -31,6 +31,10 @@ var getGameForUser = function (gameId, userId) {
       return Q.reject();
     }
 
+    if(! _.find(game.participants, {id: userId})) {
+      return Q.reject();
+    }
+
     delete game._id;
 
     _.map(game.participants, function (participant) {
@@ -46,6 +50,7 @@ var getGameForUser = function (gameId, userId) {
 };
 
 app.get('/api/games/:gameId', function (req, res) {
+  log.info(util.format('[%s] GET /api/games/%s', new Date(), req.params.gameId));
   return getCurrentUser(req.get('X-Access-Token'))
   .then(function (user) {
     return getGameForUser(req.params.gameId, user.id);
@@ -61,7 +66,9 @@ app.get('/api/games/:gameId', function (req, res) {
 });
 
 app.post('/api/games', bodyParser.json(), function (req, res) {
+  log.info(util.format('[%s] POST /api/games', new Date()));
   var crypto = require('crypto');
+  req.locals = {};
   var game;
 
   return getCurrentUser(req.get('X-Access-Token'))
@@ -74,10 +81,10 @@ app.post('/api/games', bodyParser.json(), function (req, res) {
   })
   .then(function (gameId) {
     req.body.id = gameId;
-
-    return scramble(req.body);
+    return scramble(req, req.body);
   })
   .then(function (scrambled) {
+    log.debug(scrambled);
     game = scrambled;
     return games.insert(scrambled);
   })
@@ -85,11 +92,14 @@ app.post('/api/games', bodyParser.json(), function (req, res) {
     res.send({id: game.id});
   })
   .catch(function (error) {
+    log.error(error);
+    res.status(400);
     res.send(error);
   });
 });
 
 app.put('/api/games/:gameId/likes', bodyParser.json(), function (req, res) {
+  log.info(util.format('[%s] PUT /api/games/%s', new Date(), req.params.gameId));
   var currentUser;
 
   return getCurrentUser(req.get('X-Access-Token'))
@@ -117,6 +127,7 @@ app.put('/api/games/:gameId/likes', bodyParser.json(), function (req, res) {
     res.send(game);
   })
   .catch(function (error) {
+    log.error(error);
     res.status(404);
     res.send(error);
   });

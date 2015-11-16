@@ -16,6 +16,13 @@ a[ng-click], a[data-ng-click] {
   border-color: #b8201b;
 }
 
+#loading-message {
+  color: #b3b3b3;
+  font-size: 200%;
+  padding: 4em 0;
+  text-align: center;
+}
+
 .navbar-default {
   background-color: #cc231e;
   background-image: -webkit-linear-gradient(#cc231e, #ad1e1a);
@@ -107,4 +114,42 @@ a[ng-click], a[data-ng-click] {
   display: inline-block;
   float: right;
   line-height: 34px;
+}
+
+.participants .participant-name {
+  font-weight: bold;
+  margin-left: 0.5em;
+}
+
+.participants .participant-edit {
+  display: inline-block;
+  float: right;
+  font-size: 16px;
+  line-height: 50px;
+  text-align: center;
+  width: 50px;
+}
+
+.participants .participant-edit:hover, .participants .participant-edit:focus {
+  background: #f2f2f2;
+  text-decoration: none;
+}
+
+.participants .exclusions {
+  background: #f7f7f7;
+  padding-left: 1em;
+}
+
+.participants .exclusions .exclusions-title {
+  display: block;
+  font-style: italic;
+  line-height: 2;
+}
+
+.participants .exclusions ul li {
+  background: transparent;
+}
+
+.participants .exclusions ul li + li {
+  border-top: none;
 }

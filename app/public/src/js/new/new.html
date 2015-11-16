@@ -1,0 +1,69 @@
+<div class="navbar navbar-default" data-ng-controller="NavBarCtrl as navbar">
+  <div class="container-fluid">
+    <span class="navbar-brand">Secret Santa</span>
+    <ul class="nav navbar-nav navbar-right">
+      <li>
+        <img data-ng-src="{{ navbar.picture }}">
+        <span class="navbar-text">{{ navbar.name }}</span>
+      </li>
+    </ul>
+  </div>
+</div>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-4">
+      <h4>Add Participants</h4>
+      <form class="form-horizontal" name="manualId" data-ng-submit="manualId.$valid && new.addParticipantById()">
+        <div class="form-group">
+          <div class="col-xs-9">
+            <input type="text" class="form-control" placeholder="Enter FBID..." data-ng-model="new.manualId" required>
+          </div>
+          <div class="col-xs-3">
+            <button class="btn btn-block btn-primary">Add</button>
+          </div>
+        </div>
+      </form>
+      <div class="user-search">
+        <input type="text" class="form-control" placeholder="Search for people...." data-ng-model="new.search" data-ng-change="new.updateSearch()">
+        <ul>
+          <li data-ng-repeat="user in new.searchResults.data" class="user" data-ng-click="new.toggleParticipant(user)">
+            <img data-ng-src="{{ user.picture.data.url }}">
+            {{ user.name }}
+          </li>
+          <li class="paging clearfix" data-ng-show="new.searchResults.paging">
+            <a class="prev" data-ng-show="new.searchResults.paging.previous" data-ng-click="new.updateSearch(new.searchResults.paging.previous)">Previous Page</a>
+            <a class="next" data-ng-show="new.searchResults.paging.next" data-ng-click="new.updateSearch(new.searchResults.paging.next)">Next Page</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-md-4 participants">
+      <h4>Participants</h4>
+      <ul>
+        <li data-ng-repeat="user in new.participants">
+          <img data-ng-src="{{ user.picture.data.url }}" alt="">
+          <span class="participant-name">{{ user.name }}</span>
+          <a class="participant-edit fa fa-pencil" data-ng-click="user.ui.showExclusions = !user.ui.showExclusions"></a>
+          <div class="exclusions" data-ng-show="user.ui.showExclusions">
+            <span class="exclusions-title">Don’t allow {{ user.first_name }} to be the secret santa for:</span>
+            <ul>
+              <li data-ng-repeat="exclusion in new.participants" data-ng-if="exclusion.id !== user.id">
+                <label class="control-label">
+                  <input type="checkbox" checklist-model="user.santa.exclusions" checklist-value="exclusion.id">
+                  <span class="participant-name">{{ exclusion.name }}</span>
+                </label>
+              </li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div class="col-md-4">
+      <h4>Create Game</h4>
+      <button class="btn btn-success" data-ng-class="{'disabled': new.createInProgress}" data-ng-click="new.createGame()">
+        <span data-ng-show="!new.createInProgress">Create Game!</span>
+        <span data-ng-show="new.createInProgress">Creating&hellip;</span>
+      </button>
+    </div>
+  </div>
+</div>

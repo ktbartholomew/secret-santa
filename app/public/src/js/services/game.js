@@ -51,6 +51,10 @@ angular.module(module.exports, [])
         });
       })
       .then(function (response) {
+        if(response.status >= 400) {
+          return $q.reject(response.data);
+        }
+        
         return $q.resolve(response.data);
       });
     },

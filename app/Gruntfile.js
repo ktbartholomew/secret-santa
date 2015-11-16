@@ -6,8 +6,12 @@ module.exports = function (grunt) {
           'public/dist/js/app.bundle.js': ['public/src/js/**/*.js']
         },
         options: {
+          browserifyOptions: {
+            debug: true
+          },
           watch: true,
-          keepAlive: true
+          keepAlive: true,
+          transform: ['envify']
         }
       }
     },

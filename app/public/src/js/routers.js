@@ -12,8 +12,9 @@ angular.module(module.exports, [
     return $facebook.getLoginStatus();
   }];
 
-  var requireLogin = ['facebookLoginStatus', '$state', function (facebookLoginStatus, $state) {
+  var requireLogin = ['facebookLoginStatus', '$rootScope', '$state', '$location', function (facebookLoginStatus, $rootScope, $state, $location) {
     if(!facebookLoginStatus.authResponse) {
+      $rootScope.afterLoginPath = $location.path();
       $state.go('login');
     }
   }];
@@ -52,6 +53,7 @@ angular.module(module.exports, [
     url: '/game',
     views: {
       'app@': {
+        controller: 'HomeCtrl as home',
         templateUrl: '/src/js/home/home.html'
       }
     }
@@ -59,8 +61,15 @@ angular.module(module.exports, [
   .state('app.game.view', {
     url: '/view/:gameId',
     resolve: {
-      game: ['$game', '$stateParams', function ($game, $stateParams) {
-        return $game.getGame($stateParams.gameId);
+      game: ['$game', '$q', '$state', '$stateParams', function ($game, $q, $state, $stateParams) {
+        return $game.getGame($stateParams.gameId)
+        .then(function (game) {
+          return $q.resolve(game);
+        })
+        .catch(function () {
+          $state.go('app.game');
+          return $q.reject();
+        });
       }]
     },
     views: {
@@ -74,8 +83,8 @@ angular.module(module.exports, [
     url: '/new',
     views: {
       'app@': {
-        controller: 'HomeCtrl as home',
-        templateUrl: '/src/js/home/new.html',
+        controller: 'NewCtrl as new',
+        templateUrl: '/src/js/new/new.html',
       }
     }
   });

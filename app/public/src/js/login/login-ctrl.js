@@ -3,11 +3,18 @@ var angular = require('angular');
 module.exports = 'login.login-ctrl';
 
 angular.module(module.exports, [])
-.controller('LoginCtrl', ['$facebook', '$state', function ($facebook, $state) {
+.controller('LoginCtrl', ['$facebook', '$location', '$rootScope', '$state', function ($facebook, $location, $rootScope, $state) {
   this.login = function () {
     $facebook.login()
     .then(function (response) {
-      $state.go('app.game');
+      if($rootScope.afterLoginPath) {
+        $location.path($rootScope.afterLoginPath);
+        $rootScope.afterLoginPath = null;
+
+        return;
+      }
+
+      return $state.go('app.game');
     });
   };
 }]);
