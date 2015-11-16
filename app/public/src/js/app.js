@@ -5,7 +5,6 @@ require('checklist-model'); // doesn't export a module name
 
 angular.module('app', [
   require('angular-ui-router'),
-  require('angular-cookies'),
   'checklist-model',
   require('./routers'),
   require('./services/facebook'),

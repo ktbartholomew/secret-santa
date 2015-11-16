@@ -16,7 +16,7 @@ module.exports = function (grunt) {
       },
       build: {
         files: {
-          'public/src/js/app.bundle.js': ['public/src/js/**/*.js']
+          'public/src/js/app.bundle.js': ['public/src/js/**/*.js','!public/src/js/app.bundle.js']
         },
         options: {
           transform: ['envify']
