@@ -13,6 +13,14 @@ module.exports = function (grunt) {
           keepAlive: true,
           transform: ['envify']
         }
+      },
+      build: {
+        files: {
+          'public/src/js/app.bundle.js': ['public/src/js/**/*.js']
+        },
+        options: {
+          transform: ['envify']
+        }
       }
     },
     concurrent: {
@@ -37,6 +45,24 @@ module.exports = function (grunt) {
             'node_modules'
           ]
         }
+      },
+      build: {
+        files: {
+          'public/dist/css/app.css': ['public/src/css/app.scss']
+        },
+        options: {
+          outputStyle: 'compressed',
+          includePaths: [
+            'node_modules'
+          ]
+        }
+      }
+    },
+    uglify: {
+      build: {
+        files: {
+          'public/dist/js/app.bundle.js': ['public/src/js/app.bundle.js']
+        }
       }
     },
     watch: {
@@ -51,5 +77,8 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-sass');
   grunt.loadNpmTasks('grunt-concurrent');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-watch');
+
+  grunt.registerTask('build', ['browserify:build', 'uglify:build', 'sass:build']);
 };
