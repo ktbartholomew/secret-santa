@@ -14,6 +14,7 @@ app.use(express.static('public'));
 var GRAPH_API = 'https://graph.facebook.com/v2.5';
 
 var getCurrentUser = function (token) {
+  log.debug('Finding user with access_token: ' + token);
   return request({
     url: GRAPH_API + '/me',
     qs: {
@@ -28,11 +29,11 @@ var getGameForUser = function (gameId, userId) {
   return games.findOne({id: gameId})
   .then(function (game) {
     if(!game) {
-      return Q.reject();
+      return Q.reject('No game found with id: ' + gameId);
     }
 
     if(game.status !== 'open' && !_.find(game.participants, {id: userId})) {
-      return Q.reject();
+      return Q.reject('Participant ' + userId + ' not found in game ' + gameId);
     }
 
     delete game._id;
@@ -55,13 +56,14 @@ app.get('/api/games/:gameId', function (req, res) {
   log.info(util.format('[%s] GET /api/games/%s', new Date(), req.params.gameId));
   return getCurrentUser(req.get('X-Access-Token'))
   .then(function (user) {
+    log.debug('getCurrentUser: ' + JSON.stringify(user));
     return getGameForUser(req.params.gameId, user.id);
   })
   .then(function (game) {
     res.send(game);
   })
   .catch(function (error) {
-    log.error(error);
+    log.error(JSON.stringify(error));
     res.status(404);
     res.end();
   });
