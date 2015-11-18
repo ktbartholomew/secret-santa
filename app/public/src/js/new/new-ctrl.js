@@ -1,16 +1,13 @@
 var angular = require('angular');
 var _ = require('lodash');
 
-var moduleName = 'new.new-ctrl';
-module.exports = moduleName;
-
-angular.module(moduleName, [
+module.exports = angular.module('new.new-ctrl', [
   require('../services/game')
 ])
 .controller('NewCtrl', ['$facebook', '$game', '$state', function ($facebook, $game, $state) {
-  this.searchResults = [];
-  this.manualId = '';
-  this.participants = $game.participants;
+  this.name = '';
+  this.price_instructions = '';
+  this.open_until = '';
   this.createInProgress = false;
 
   $facebook.getMe()
@@ -18,30 +15,13 @@ angular.module(moduleName, [
     $game.addParticipant(me);
   });
 
-  this.updateSearch = function (paging) {
-    $facebook.findUsers(this.search, paging)
-    .then(function (users) {
-      this.searchResults = users;
-    }.bind(this));
-  };
-
-  this.addParticipantById = function () {
-    $facebook.getUser(this.manualId)
-    .then(function (user) {
-      $game.addParticipant(user);
-      this.manualId = '';
-    }.bind(this));
-  };
-
-  this.toggleParticipant = function (user) {
-    $game.addParticipant(user);
-    this.search = '';
-    this.searchResults = [];
-  };
-
   this.createGame = function () {
     this.createInProgress = true;
-    $game.create()
+    $game.create({
+      name: this.name,
+      price_instructions: this.price_instructions,
+      open_until: this.open_until
+    })
     .then(function (game) {
       $state.go('app.game.view', {gameId: game.id});
     }.bind(this))
@@ -49,4 +29,4 @@ angular.module(moduleName, [
       this.createInProgress = false;
     }.bind(this));
   };
-}]);
+}]).name;

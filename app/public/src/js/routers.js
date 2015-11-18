@@ -12,6 +12,10 @@ angular.module(module.exports, [
     return $facebook.getLoginStatus();
   }];
 
+  var currentUser = ['$facebook', function ($facebook) {
+    return $facebook.getMe();
+  }];
+
   var requireLogin = ['facebookLoginStatus', '$rootScope', '$state', '$location', function (facebookLoginStatus, $rootScope, $state, $location) {
     if(!facebookLoginStatus.authResponse) {
       $rootScope.afterLoginPath = $location.path();
@@ -61,6 +65,7 @@ angular.module(module.exports, [
   .state('app.game.view', {
     url: '/view/:gameId',
     resolve: {
+      currentUser: currentUser,
       game: ['$game', '$q', '$state', '$stateParams', function ($game, $q, $state, $stateParams) {
         return $game.getGame($stateParams.gameId)
         .then(function (game) {
@@ -74,8 +79,27 @@ angular.module(module.exports, [
     },
     views: {
       'app@': {
-        controller: 'ViewCtrl as view',
-        templateUrl: '/src/js/view/view.html'
+        controllerProvider: ['$controller', '$rootScope', 'currentUser', 'game', function ($controller, $rootScope, currentUser, game) {
+          var controllerExpression = (game.status === 'open') ? 'ViewOpenCtrl as view' : 'ViewClosedCtrl as view';
+
+          $controller(controllerExpression, {
+            '$scope': $rootScope.$new(),
+            'currentUser': currentUser,
+            'game': game
+          });
+
+          return controllerExpression;
+        }],
+        templateProvider: ['$http', '$templateCache', 'game', function ($http, $templateCache, game) {
+          var templateUrl = (game.status === 'open') ? '/src/js/view/view-open.html' : '/src/js/view/view-closed.html';
+
+          return $http.get(templateUrl)
+          .then(function (response) {
+            $templateCache.put(templateUrl, response.data);
+
+            return $templateCache.get(templateUrl);
+          });
+        }]
       }
     }
   })

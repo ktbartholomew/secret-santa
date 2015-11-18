@@ -1,0 +1,89 @@
+<div data-ng-include="'/src/js/home/navbar.html'" data-ng-controller="NavBarCtrl as navbar"></div>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="page-header">
+        <h1 class="title">{{ view.game.name }}</h1>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-3" data-ng-show="!view.isParticipant()">
+      <h3>Join this game!</h3>
+      <p>Click <strong>Join Game</strong> below to join this game. When the game’s organizer closes enrollment, you will receive an email telling you who you’re the secret santa for.</p>
+      <button class="btn btn-success btn-block" data-ng-class="{'disabled': view.saveInProgress}" data-ng-click="view.join()">
+        <span data-ng-show="view.saveInProgress">Joining&hellip;</span>
+        <span data-ng-show="!view.saveInProgress">Join Game</span>
+      </button>
+    </div>
+    <div class="col-sm-3" data-ng-show="view.isParticipant()">
+      <h3>Help your secret santa!</h3>
+      <form class="form" data-ng-submit="view.addLikes()">
+        <div class="form-group">
+          <label for="" class="control-label">What do you like?</label>
+          <textarea name="likes" rows="5" class="form-control" placeholder="Enter things you’d like to receive&hellip;" data-ng-model="view.likes"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="" class="control-label">What do you <em>not</em> like?</label>
+          <textarea name="likes" rows="5" class="form-control" placeholder="Enter things you’d rather not get&hellip;" data-ng-model="view.dislikes"></textarea>
+        </div>
+        <div class="form-group">
+          <button class="btn btn-success btn-block" data-ng-class="{'disabled': view.saveInProgress}" type="submit">
+            <span data-ng-show="view.saveInProgress">Saving&hellip;</span>
+            <span data-ng-show="!view.saveInProgress">Save</span>
+          </button>
+        </div>
+      </form>
+    </div>
+    <div class="col-sm-6">
+      <h3>Game Info</h3>
+      <div class="panel panel-primary" data-ng-if="view.isOrganizer()">
+        <div class="panel-heading">
+          <h4 class="panel-title">You are this game’s organizer</h4>
+        </div>
+        <div class="panel-body">
+          <p>Share this page’s URL with anyone you would like to join this game:</p>
+          <div class="form-group">
+            <input type="text" class="form-control" data-ng-value="view.gameUrl" readonly>
+          </div>
+          <p>When you are ready to begin the game, close enrollment. Choose <strong>Begin game</strong> to start the game as-is. Choose <strong>Edit participants</strong> to remove participants and specify assignment exclusions before starting. Whichever you choose, no new participants will be able to join the game.</p>
+          <div>
+            <button class="btn btn-success" data-ng-click="view.closeGame()">Begin game</button>
+            <button class="btn btn-link">Edit participants</button>
+          </div>
+        </div>
+      </div>
+      <p></p>
+      <table class="table">
+        <tbody>
+          <tr>
+            <th>Enrollment status</th>
+            <td><span class="label label-success">Open</span></td>
+          </tr>
+          <tr>
+            <th>Deadline to join</th>
+            <td>{{ view.game.open_until }}</td>
+          </tr>
+          <tr>
+            <th>Price instructions</th>
+            <td>{{ view.game.price_instructions }}</td>
+          </tr>
+          <tr>
+            <th>Organizer</th>
+            <td><a data-ng-href="https://www.facebook.com/{{ view.game.organizer.id }}" target="_blank">{{ view.game.organizer.name }}</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="col-sm-3 participants">
+      <h3>Participants</h3>
+      <ul>
+        <li data-ng-repeat="user in view.game.participants">
+          <img data-ng-src="{{ user.picture.data.url }}" alt="">
+          <a data-ng-href="https://www.facebook.com/{{ user.id }}" target="_blank">{{ user.name }}</a>
+          <span class="label label-default" data-ng-if="user.id == view.game.organizer.id">Organizer</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

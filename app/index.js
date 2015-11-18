@@ -17,7 +17,7 @@ var getCurrentUser = function (token) {
   return request({
     url: GRAPH_API + '/me',
     qs: {
-      fields: 'id,name',
+      fields: 'id,name,first_name,email,picture',
       access_token: token
     },
     json: true
@@ -31,13 +31,15 @@ var getGameForUser = function (gameId, userId) {
       return Q.reject();
     }
 
-    if(! _.find(game.participants, {id: userId})) {
+    if(game.status !== 'open' && !_.find(game.participants, {id: userId})) {
       return Q.reject();
     }
 
     delete game._id;
 
     _.map(game.participants, function (participant) {
+      delete participant.email;
+
       if(participant.id !== userId) {
         delete participant.santa.recipient;
       }
@@ -73,23 +75,80 @@ app.post('/api/games', bodyParser.json(), function (req, res) {
 
   return getCurrentUser(req.get('X-Access-Token'))
   .then(function (user) {
-    req.body.creator = user;
+    req.body.organizer = user;
+
+    // don't want this hanging around
+    delete req.body.organizer.email;
+
+    req.body.created_date = new Date();
+    req.body.status = 'open';
     return Q.ninvoke(crypto, 'randomBytes', 32);
   })
   .then(function (bytes) {
+    req.body.id = bytes.toString('hex');
     return Q.resolve(bytes.toString('hex'));
   })
-  .then(function (gameId) {
-    req.body.id = gameId;
-    return scramble(req, req.body);
-  })
-  .then(function (scrambled) {
-    log.debug(scrambled);
-    game = scrambled;
-    return games.insert(scrambled);
+  .then(function (bytes) {
+    return games.insert(req.body);
   })
   .then(function () {
-    res.send({id: game.id});
+    res.send({id: req.body.id});
+  })
+  .catch(function (error) {
+    log.error(error);
+    res.status(400);
+    res.send(error);
+  });
+});
+
+app.put('/api/games/:gameId/status', bodyParser.json(), function (req, res) {
+  log.info(util.format('[%s] PUT /api/games/%s/status', new Date(), req.params.gameId));
+  var currentUser;
+
+  // everyday i'm shuffling
+  req.locals = {};
+
+  return getCurrentUser(req.get('X-Access-Token'))
+  .then(function (user) {
+    currentUser = user;
+    return games.findOne({id: req.params.gameId});
+  })
+  .then(function (game) {
+    // permissions and good request checks
+    if(currentUser.id !== game.organizer.id) {
+      throw 'Only the organizer can update a game’s status.';
+    }
+
+    if(['preparing', 'closed'].indexOf(req.body.status) === -1) {
+      throw 'status must be "preparing" or "closed".';
+    }
+
+    if(req.body.status === 'preparing' && game.status !== 'open') {
+      throw 'status can only be set to "preparing" if it was previously "open".';
+    }
+
+    return games.findOne({id: req.params.gameId});
+  })
+  .then(function (game) {
+    if(req.body.status === 'closed') {
+      return scramble(req, game);
+    }
+
+    return Q.resolve(game);
+  })
+  .then(function (scrambledGame) {
+    return games.update({id: scrambledGame.id}, {
+      $set: {
+        status: req.body.status,
+        participants: scrambledGame.participants
+      }
+    });
+  })
+  .then(function () {
+    return getGameForUser(req.params.gameId, currentUser.id);
+  })
+  .then(function (game) {
+    res.send(game);
   })
   .catch(function (error) {
     log.error(error);
@@ -99,7 +158,7 @@ app.post('/api/games', bodyParser.json(), function (req, res) {
 });
 
 app.put('/api/games/:gameId/likes', bodyParser.json(), function (req, res) {
-  log.info(util.format('[%s] PUT /api/games/%s', new Date(), req.params.gameId));
+  log.info(util.format('[%s] PUT /api/games/%s/likes', new Date(), req.params.gameId));
   var currentUser;
 
   return getCurrentUser(req.get('X-Access-Token'))
@@ -128,7 +187,51 @@ app.put('/api/games/:gameId/likes', bodyParser.json(), function (req, res) {
   })
   .catch(function (error) {
     log.error(error);
-    res.status(404);
+    res.status(400);
+    res.send(error);
+  });
+});
+
+app.put('/api/games/:gameId/join', function (req, res) {
+  log.info(util.format('[%s] PUT /api/games/%s/join', new Date(), req.params.gameId));
+  var currentUser;
+
+  return getCurrentUser(req.get('X-Access-Token'))
+  .then(function (user) {
+    currentUser = user;
+    return games.findOne({id: req.params.gameId});
+  })
+  .then(function (game) {
+    if(game.status !== 'open') {
+      throw 'This game is no longer accepting new participants.';
+    }
+
+    if(_.find(game.participants, {id: currentUser.id})) {
+      throw util.format('User %s is already a participant in game %s and cannot join again', currentUser.name, req.params.gameId);
+    }
+
+    var newParticipant = currentUser;
+    newParticipant.santa = {
+      exclusions: [],
+      likes: '',
+      dislikes: ''
+    };
+
+    return games.update({id: game.id}, {
+      $push: {
+        participants: newParticipant
+      }
+    });
+  })
+  .then(function () {
+    return getGameForUser(req.params.gameId, currentUser.id);
+  })
+  .then(function (game) {
+    res.send(game);
+  })
+  .catch(function (error) {
+    log.error(error);
+    res.status(400);
     res.send(error);
   });
 });

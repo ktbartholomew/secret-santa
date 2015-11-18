@@ -1,0 +1,8 @@
+.panel-primary {
+  border-color: $christmas-red;
+
+  .panel-heading {
+    background: $christmas-red;
+    border-bottom-color: shade($christmas-red, 10%);
+  }
+}

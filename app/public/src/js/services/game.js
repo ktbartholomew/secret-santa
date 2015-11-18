@@ -54,14 +54,31 @@ angular.module(module.exports, [])
         if(response.status >= 400) {
           return $q.reject(response.data);
         }
-        
+
         return $q.resolve(response.data);
       });
     },
-    create: function () {
-      var game = {
-        participants: this.participants
-      };
+    join: function (gameId) {
+      return $facebook.getLoginStatus()
+      .then(function (status) {
+        return $http({
+          method: 'PUT',
+          url: '/api/games/' + gameId + '/join',
+          headers: {
+            'X-Access-Token': status.authResponse.accessToken
+          }
+        });
+      })
+      .then(function (response) {
+        if(response.status >= 400) {
+          return $q.reject(response.data);
+        }
+
+        return $q.resolve(response.data);
+      });
+    },
+    create: function (gameData) {
+      gameData.participants = this.participants;
 
       return $facebook.getLoginStatus()
       .then(function (status) {
@@ -71,7 +88,33 @@ angular.module(module.exports, [])
           headers: {
             'X-Access-Token': status.authResponse.accessToken
           },
-          data: game
+          data: gameData
+        });
+      })
+      .then(function (response) {
+        if(response.status >= 400) {
+          return $q.reject(response.data);
+        }
+
+        return $q.resolve(response.data);
+      });
+    },
+    setStatus: function (gameId, gameStatus) {
+      return $facebook.getLoginStatus()
+      .then(function (status) {
+        if(!status.authResponse) {
+          return $q.reject(status);
+        }
+
+        return $http({
+          method: 'PUT',
+          url: '/api/games/' + gameId + '/status',
+          headers: {
+            'X-Access-Token': status.authResponse.accessToken
+          },
+          data: {
+            status: gameStatus
+          }
         });
       })
       .then(function (response) {

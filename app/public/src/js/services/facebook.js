@@ -7,6 +7,7 @@ angular.module(moduleName, [])
 .provider('$facebook', [function () {
   var options = {};
   var loginStatus;
+  var currentUser;
 
   FB.getLoginStatus(function (status) {
     loginStatus = status;
@@ -34,10 +35,15 @@ angular.module(moduleName, [])
         });
       },
       getMe: function () {
+        if(currentUser) {
+          return $q.resolve(currentUser);
+        }
+
         return this.isLoggedIn()
         .then(function (status) {
           return $q(function (resolve, reject) {
             FB.api('/me', {fields: 'first_name,name,picture'}, function (me) {
+              currentUser = me;
               resolve(me);
             });
           });
@@ -73,7 +79,7 @@ angular.module(moduleName, [])
         return $q(function (resolve, reject) {
           FB.login(function (response) {
             return resolve(response);
-          }, {scope: 'public_profile,user_friends'});
+          }, {scope: 'public_profile,email'});
         });
       }
     };

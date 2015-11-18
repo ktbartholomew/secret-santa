@@ -11,59 +11,29 @@
 </div>
 <div class="container-fluid">
   <div class="row">
-    <div class="col-md-4">
-      <h4>Add Participants</h4>
-      <form class="form-horizontal" name="manualId" data-ng-submit="manualId.$valid && new.addParticipantById()">
+    <div class="col-md-6 col-md-offset-3">
+      <form data-ng-submit="new.createGame()" novalidate>
+        <ol>
+          <li>Create your game. It will have open admission and anyone can join.</li>
+          <li>When everyone you want to join has joined, close admission.</li>
+          <li>Secret santas will be randomly assigned among everyone who joined your game!</li>
+        </ol>
         <div class="form-group">
-          <div class="col-xs-9">
-            <input type="text" class="form-control" placeholder="Enter FBID..." data-ng-model="new.manualId" required>
-          </div>
-          <div class="col-xs-3">
-            <button class="btn btn-block btn-primary">Add</button>
-          </div>
+          <label for="">Game name: *</label>
+          <input type="text" class="form-control" placeholder="Enter a name for the game..." data-ng-model="new.name" required>
+        </div>
+        <div class="form-group">
+          <label for="">Price instructions: *</label>
+          <input type="text" class="form-control" placeholder="(e.g: No more than $25)" data-ng-model="new.price_instructions" required>
+        </div>
+        <div class="form-group">
+          <label for="">Open admission until:</label>
+          <input type="text" class="form-control" placeholder="When do you plan to close admission and start the game?" data-ng-model="new.open_until">
+        </div>
+        <div class="form-group">
+          <button type="submit" class="btn btn-primary">Create Game</button>
         </div>
       </form>
-      <div class="user-search">
-        <input type="text" class="form-control" placeholder="Search for people...." data-ng-model="new.search" data-ng-change="new.updateSearch()">
-        <ul>
-          <li data-ng-repeat="user in new.searchResults.data" class="user" data-ng-click="new.toggleParticipant(user)">
-            <img data-ng-src="{{ user.picture.data.url }}">
-            {{ user.name }}
-          </li>
-          <li class="paging clearfix" data-ng-show="new.searchResults.paging">
-            <a class="prev" data-ng-show="new.searchResults.paging.previous" data-ng-click="new.updateSearch(new.searchResults.paging.previous)">Previous Page</a>
-            <a class="next" data-ng-show="new.searchResults.paging.next" data-ng-click="new.updateSearch(new.searchResults.paging.next)">Next Page</a>
-          </li>
-        </ul>
-      </div>
-    </div>
-    <div class="col-md-4 participants">
-      <h4>Participants</h4>
-      <ul>
-        <li data-ng-repeat="user in new.participants">
-          <img data-ng-src="{{ user.picture.data.url }}" alt="">
-          <span class="participant-name">{{ user.name }}</span>
-          <a class="participant-edit fa fa-pencil" data-ng-click="user.ui.showExclusions = !user.ui.showExclusions"></a>
-          <div class="exclusions" data-ng-show="user.ui.showExclusions">
-            <span class="exclusions-title">Don’t allow {{ user.first_name }} to be the secret santa for:</span>
-            <ul>
-              <li data-ng-repeat="exclusion in new.participants" data-ng-if="exclusion.id !== user.id">
-                <label class="control-label">
-                  <input type="checkbox" checklist-model="user.santa.exclusions" checklist-value="exclusion.id">
-                  <span class="participant-name">{{ exclusion.name }}</span>
-                </label>
-              </li>
-            </ul>
-          </div>
-        </li>
-      </ul>
-    </div>
-    <div class="col-md-4">
-      <h4>Create Game</h4>
-      <button class="btn btn-success" data-ng-class="{'disabled': new.createInProgress}" data-ng-click="new.createGame()">
-        <span data-ng-show="!new.createInProgress">Create Game!</span>
-        <span data-ng-show="new.createInProgress">Creating&hellip;</span>
-      </button>
     </div>
   </div>
 </div>
