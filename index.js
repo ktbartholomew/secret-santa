@@ -1,12 +1,12 @@
 var util = require('util');
 var express = require('express');
-var log = require('./log');
+var log = require('./lib/log');
 var bodyParser = require('body-parser');
 var Q = require('q');
 var _ = require('lodash');
 var request = require('request-promise');
-var scramble = require('./scramble');
-var games = require('./games');
+var scramble = require('./lib/scramble');
+var games = require('./lib/games');
 var app = express();
 
 app.use(express.static('public'));
@@ -28,11 +28,11 @@ var getCurrentUser = function (token) {
 var getGameForUser = function (gameId, userId) {
   return games.findOne({id: gameId})
   .then(function (game) {
-    if(!game) {
+    if (!game) {
       return Q.reject('No game found with id: ' + gameId);
     }
 
-    if(game.status !== 'open' && !_.find(game.participants, {id: userId})) {
+    if (game.status !== 'open' && !_.find(game.participants, {id: userId})) {
       return Q.reject('Participant ' + userId + ' not found in game ' + gameId);
     }
 
@@ -41,7 +41,7 @@ var getGameForUser = function (gameId, userId) {
     _.map(game.participants, function (participant) {
       delete participant.email;
 
-      if(participant.id !== userId) {
+      if (participant.id !== userId) {
         delete participant.santa.recipient;
       }
 
@@ -73,7 +73,6 @@ app.post('/api/games', bodyParser.json(), function (req, res) {
   log.info(util.format('[%s] POST /api/games', new Date()));
   var crypto = require('crypto');
   req.locals = {};
-  var game;
 
   return getCurrentUser(req.get('X-Access-Token'))
   .then(function (user) {
@@ -84,13 +83,8 @@ app.post('/api/games', bodyParser.json(), function (req, res) {
 
     req.body.created_date = new Date();
     req.body.status = 'open';
-    return Q.ninvoke(crypto, 'randomBytes', 32);
-  })
-  .then(function (bytes) {
-    req.body.id = bytes.toString('hex');
-    return Q.resolve(bytes.toString('hex'));
-  })
-  .then(function (bytes) {
+    req.body.id = crypto.randomBytes(16).toString('hex');
+
     return games.insert(req.body);
   })
   .then(function () {
@@ -117,22 +111,22 @@ app.put('/api/games/:gameId/status', bodyParser.json(), function (req, res) {
   })
   .then(function (game) {
     // permissions and good request checks
-    if(currentUser.id !== game.organizer.id) {
-      throw 'Only the organizer can update a game’s status.';
+    if (currentUser.id !== game.organizer.id) {
+      throw new Error('Only the organizer can update a game’s status.');
     }
 
-    if(['preparing', 'closed'].indexOf(req.body.status) === -1) {
-      throw 'status must be "preparing" or "closed".';
+    if (['preparing', 'closed'].indexOf(req.body.status) === -1) {
+      throw new Error('status must be "preparing" or "closed".');
     }
 
-    if(req.body.status === 'preparing' && game.status !== 'open') {
-      throw 'status can only be set to "preparing" if it was previously "open".';
+    if (req.body.status === 'preparing' && game.status !== 'open') {
+      throw new Error('status can only be set to "preparing" if it was previously "open".');
     }
 
     return games.findOne({id: req.params.gameId});
   })
   .then(function (game) {
-    if(req.body.status === 'closed') {
+    if (req.body.status === 'closed') {
       return scramble(req, game);
     }
 
@@ -204,12 +198,12 @@ app.put('/api/games/:gameId/join', function (req, res) {
     return games.findOne({id: req.params.gameId});
   })
   .then(function (game) {
-    if(game.status !== 'open') {
-      throw 'This game is no longer accepting new participants.';
+    if (game.status !== 'open') {
+      throw new Error('This game is no longer accepting new participants.');
     }
 
-    if(_.find(game.participants, {id: currentUser.id})) {
-      throw util.format('User %s is already a participant in game %s and cannot join again', currentUser.name, req.params.gameId);
+    if (_.find(game.participants, {id: currentUser.id})) {
+      throw new Error(util.format('User %s is already a participant in game %s and cannot join again', currentUser.name, req.params.gameId));
     }
 
     var newParticipant = currentUser;

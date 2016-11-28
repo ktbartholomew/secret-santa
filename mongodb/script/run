@@ -1,8 +1,0 @@
-#!/bin/bash
-
-docker run \
--d \
---name santa-mongo \
--P \
---volumes-from=santa-mongo-data \
-mongo:3.1.9 --auth

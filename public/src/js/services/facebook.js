@@ -9,6 +9,10 @@ angular.module(moduleName, [])
   var loginStatus;
   var currentUser;
 
+  (options, loginStatus);
+
+  var FB = window.FB;
+
   FB.getLoginStatus(function (status) {
     loginStatus = status;
   });
@@ -18,10 +22,9 @@ angular.module(moduleName, [])
       isLoggedIn: function () {
         return $q(function (resolve, reject) {
           FB.getLoginStatus(function (status) {
-            if(status.status === 'connected') {
+            if (status.status === 'connected') {
               resolve(status);
-            }
-            else {
+            } else {
               reject();
             }
           });
@@ -35,7 +38,7 @@ angular.module(moduleName, [])
         });
       },
       getMe: function () {
-        if(currentUser) {
+        if (currentUser) {
           return $q.resolve(currentUser);
         }
 
@@ -66,9 +69,8 @@ angular.module(moduleName, [])
       findUsers: function (name, paging) {
         return $q(function (resolve, reject) {
           var offset = 0;
-          if(paging) {
+          if (paging) {
             offset = paging.match(/offset=(\d+)/)[1];
-            console.log(offset);
           }
           FB.api('/search', {type: 'user', q: name, fields: 'first_name,name,picture', limit: 25, offset: offset}, function (results) {
             resolve(results);

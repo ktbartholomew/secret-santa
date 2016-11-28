@@ -4,8 +4,8 @@
   "description": "An app for randomly generating secret santa pairings",
   "main": "Gruntfile.js",
   "scripts": {
-    "test": "npm test",
-    "start": "grunt build; node index.js"
+    "test": "exit 0;",
+    "start": "grunt build && node index.js"
   },
   "repository": {
     "type": "git",

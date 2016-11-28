@@ -14,7 +14,7 @@ angular.module('app', [
   require('./view/view')
 ]);
 
-FB.init({
+window.FB.init({
   appId: process.env.FACEBOOK_APP_ID,
   cookie: true,
   version: 'v2.5'
