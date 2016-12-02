@@ -16,8 +16,19 @@ angular.module(module.exports, [
     return $facebook.getMe();
   }];
 
+  var game = ['$game', '$q', '$state', '$stateParams', function ($game, $q, $state, $stateParams) {
+    return $game.getGame($stateParams.gameId)
+    .then(function (game) {
+      return $q.resolve(game);
+    })
+    .catch(function () {
+      $state.go('app.game');
+      return $q.reject();
+    });
+  }];
+
   var requireLogin = ['facebookLoginStatus', '$rootScope', '$state', '$location', function (facebookLoginStatus, $rootScope, $state, $location) {
-    if(!facebookLoginStatus.authResponse) {
+    if (!facebookLoginStatus.authResponse) {
       $rootScope.afterLoginPath = $location.path();
       $state.go('login');
     }
@@ -38,7 +49,7 @@ angular.module(module.exports, [
       facebookLogin: ['$facebook', '$q', '$state', function ($facebook, $q, $state) {
         return $facebook.getLoginStatus()
         .then(function (status) {
-          if(status.status === 'connected') {
+          if (status.status === 'connected') {
             return $state.go('app.game');
           }
 
@@ -66,16 +77,7 @@ angular.module(module.exports, [
     url: '/view/:gameId',
     resolve: {
       currentUser: currentUser,
-      game: ['$game', '$q', '$state', '$stateParams', function ($game, $q, $state, $stateParams) {
-        return $game.getGame($stateParams.gameId)
-        .then(function (game) {
-          return $q.resolve(game);
-        })
-        .catch(function () {
-          $state.go('app.game');
-          return $q.reject();
-        });
-      }]
+      game: game
     },
     views: {
       'app@': {
@@ -103,12 +105,39 @@ angular.module(module.exports, [
       }
     }
   })
+  .state('app.game.edit', {
+    url: '/edit/:gameId',
+    resolve: {
+      currentUser: currentUser,
+      game: game,
+      isOrganizer: [
+        'currentUser',
+        'game',
+        '$q',
+        '$state',
+        function (currentUser, game, $q, $state) {
+          if (currentUser.id === game.organizer.id) {
+            return $q.resolve(true);
+          }
+
+          $state.go('app.game.view', {gameId: game.id});
+          return $q.reject(false);
+        }
+      ]
+    },
+    views: {
+      'app@': {
+        controller: 'EditCtrl as edit',
+        templateUrl: '/src/js/view/edit.html'
+      }
+    }
+  })
   .state('app.game.new', {
     url: '/new',
     views: {
       'app@': {
         controller: 'NewCtrl as new',
-        templateUrl: '/src/js/new/new.html',
+        templateUrl: '/src/js/new/new.html'
       }
     }
   });

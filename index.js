@@ -97,6 +97,91 @@ app.post('/api/games', bodyParser.json(), function (req, res) {
   });
 });
 
+app.put('/api/games/:gameId/participants/:participantId/exclusions', bodyParser.json(), function (req, res) {
+  log.info(util.format('[%s] %s %s', new Date(), req.method, req.url));
+  var currentUser;
+
+  return getCurrentUser(req.get('X-Access-Token'))
+  .then(function (user) {
+    currentUser = user;
+    return games.findOne({id: req.params.gameId});
+  })
+  .then(function (game) {
+    // permissions and good request checks
+    if (currentUser.id !== game.organizer.id) {
+      res.status(401);
+      throw new Error('Only the organizer can update exclusions.');
+    }
+
+    log.debug('updating exclusions', {
+      game: req.params.gameId,
+      participant: req.params.participantId,
+      exclusions: req.body.exclusions
+    });
+
+    return games.update({
+      id: req.params.gameId,
+      'participants.id': req.params.participantId
+    }, {
+      $set: {
+        'participants.$.santa.exclusions': req.body.exclusions
+      }
+    })
+    .then(function () {
+      res.sendStatus(202);
+    });
+  })
+  .catch(function (error) {
+    log.warn(error);
+    res.end();
+  });
+});
+
+app.delete('/api/games/:gameId/participants/:participantId', function (req, res) {
+  log.info(util.format('[%s] %s %s', new Date(), req.method, req.url));
+  var currentUser;
+
+  return getCurrentUser(req.get('X-Access-Token'))
+  .then(function (user) {
+    currentUser = user;
+    return games.findOne({id: req.params.gameId});
+  })
+  .then(function (game) {
+    // permissions and good request checks
+    if (currentUser.id !== game.organizer.id) {
+      res.status(401);
+      throw new Error('Only the organizer can remove participants.');
+    }
+
+    if (req.params.participantId === game.organizer.id) {
+      res.status(400);
+      throw new Error('The organizer cannot be removed.');
+    }
+
+    if (_.filter(game.participants, {id: req.params.participantId}).length === 0) {
+      res.status(404);
+      throw new Error(util.format(
+        'Participant %s does not exist in game %s',
+        req.params.participantId,
+        req.params.gameId)
+      );
+    }
+
+    return games.update({id: req.params.gameId}, {
+      $pull: {
+        participants: {id: req.params.participantId}
+      }
+    });
+  })
+  .then(function () {
+    res.sendStatus(204);
+  })
+  .catch(function (error) {
+    log.warn(error);
+    res.end();
+  });
+});
+
 app.put('/api/games/:gameId/status', bodyParser.json(), function (req, res) {
   log.info(util.format('[%s] PUT /api/games/%s/status', new Date(), req.params.gameId));
   var currentUser;

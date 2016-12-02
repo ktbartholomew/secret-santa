@@ -1,0 +1,37 @@
+<div data-ng-include="'/src/js/home/navbar.html'" data-ng-controller="NavBarCtrl as navbar"></div>
+<div class="container-fluid edit">
+  <div class="row">
+    <div class="col-sm-12">
+      <h1 class="title">
+        {{ edit.game.name }} <br>
+        <span class="small">Editing participants</span>
+      </h1>
+      <div class="participant-list">
+        <div class="participant" data-ng-repeat="participant in edit.game.participants" data-ng-if="!edit.isPendingDeletion(participant.id)">
+          <div class="info-row">
+            <div class="avatar"><img data-ng-src="{{ participant.picture.data.url }}" alt="{{ participant.name }}"></div>
+            <div class="name">
+              <strong>{{ participant.name }}</strong>
+            </div>
+            <div class="action" data-ng-if="edit.game.organizer.id !== participant.id">
+              <a data-ng-click="edit.removeParticipant(participant.id)"><span class="fa fa-times"></span></a>
+            </div>
+          </div>
+          <div class="edit-row">
+            <h5>Don't allow {{ participant.first_name }} to be the secret santa for:</h5>
+            <div class="exclusion-item" data-ng-repeat="recipient in edit.game.participants" data-ng-if="!edit.isPendingDeletion(recipient.id) && recipient.id !== participant.id">
+              <input type="checkbox" data-checklist-model="edit.getExclusionObject(participant.id).exclusions" data-checklist-value="recipient.id">
+              {{ recipient.name }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-12">
+      <button class="btn btn-primary" data-ng-click="edit.save()">Save Changes</button>
+      <button data-ui-sref="app.game.view({gameId: edit.game.id})" class="btn btn-link">Cancel</button>
+    </div>
+  </div>
+</div>

@@ -14,14 +14,49 @@ angular.module(module.exports, [])
         dislikes: ''
       };
 
-      if(!_.find(this.participants, {id: participant.id})) {
+      if (!_.find(this.participants, {id: participant.id})) {
         this.participants.push(participant);
       }
+    },
+    removeParticipant: function (gameId, participantId) {
+      return $facebook.getLoginStatus()
+      .then(function (status) {
+        if (!status.authResponse) {
+          return $q.reject(status);
+        }
+
+        return $http({
+          method: 'DELETE',
+          url: '/api/games/' + gameId + '/participants/' + participantId,
+          headers: {
+            'X-Access-Token': status.authResponse.accessToken
+          }
+        });
+      });
+    },
+    setExclusions: function (gameId, participantId, exclusions) {
+      return $facebook.getLoginStatus()
+      .then(function (status) {
+        if (!status.authResponse) {
+          return $q.reject(status);
+        }
+
+        return $http({
+          method: 'PUT',
+          url: '/api/games/' + gameId + '/participants/' + participantId + '/exclusions',
+          headers: {
+            'X-Access-Token': status.authResponse.accessToken
+          },
+          data: {
+            exclusions: exclusions
+          }
+        });
+      });
     },
     addLikes: function (gameId, data) {
       return $facebook.getLoginStatus()
       .then(function (status) {
-        if(!status.authResponse) {
+        if (!status.authResponse) {
           return $q.reject(status);
         }
 
@@ -38,7 +73,7 @@ angular.module(module.exports, [])
     getGame: function (id) {
       return $facebook.getLoginStatus()
       .then(function (status) {
-        if(!status.authResponse) {
+        if (!status.authResponse) {
           return $q.reject(status);
         }
 
@@ -51,7 +86,7 @@ angular.module(module.exports, [])
         });
       })
       .then(function (response) {
-        if(response.status >= 400) {
+        if (response.status >= 400) {
           return $q.reject(response.data);
         }
 
@@ -70,7 +105,7 @@ angular.module(module.exports, [])
         });
       })
       .then(function (response) {
-        if(response.status >= 400) {
+        if (response.status >= 400) {
           return $q.reject(response.data);
         }
 
@@ -92,7 +127,7 @@ angular.module(module.exports, [])
         });
       })
       .then(function (response) {
-        if(response.status >= 400) {
+        if (response.status >= 400) {
           return $q.reject(response.data);
         }
 
@@ -102,7 +137,7 @@ angular.module(module.exports, [])
     setStatus: function (gameId, gameStatus) {
       return $facebook.getLoginStatus()
       .then(function (status) {
-        if(!status.authResponse) {
+        if (!status.authResponse) {
           return $q.reject(status);
         }
 
@@ -118,7 +153,7 @@ angular.module(module.exports, [])
         });
       })
       .then(function (response) {
-        if(response.status >= 400) {
+        if (response.status >= 400) {
           return $q.reject(response.data);
         }
 

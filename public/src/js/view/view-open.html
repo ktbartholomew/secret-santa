@@ -49,7 +49,7 @@
           <p>When you are ready to begin the game, close enrollment. Choose <strong>Begin game</strong> to start the game as-is. Choose <strong>Edit participants</strong> to remove participants and specify assignment exclusions before starting. Whichever you choose, no new participants will be able to join the game.</p>
           <div>
             <button class="btn btn-success" data-ng-click="view.closeGame()">Begin game</button>
-            <button class="btn btn-link">Edit participants</button>
+            <a class="btn btn-link" data-ui-sref="app.game.edit({gameId: view.game.id})">Edit participants</a>
           </div>
         </div>
       </div>
