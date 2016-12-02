@@ -5,4 +5,5 @@ module.exports = moduleName;
 
 angular.module(moduleName, [
   require('./view-ctrl.js'),
+  require('./edit-ctrl.js')
 ]);
