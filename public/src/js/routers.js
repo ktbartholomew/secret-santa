@@ -16,6 +16,18 @@ angular.module(module.exports, [
     return $facebook.getMe();
   }];
 
+  var setPageTitle = function (title) {
+    return [
+      '$pageTitle',
+      '$q',
+      function ($pageTitle, $q) {
+        $pageTitle.set(title);
+
+        return $q.resolve(title);
+      }
+    ];
+  };
+
   var game = ['$game', '$q', '$state', '$stateParams', function ($game, $q, $state, $stateParams) {
     return $game.getGame($stateParams.gameId)
     .then(function (game) {
@@ -55,7 +67,8 @@ angular.module(module.exports, [
 
           return $q.resolve(status);
         });
-      }]
+      }],
+      pageTitle: setPageTitle('Log in with Facebook')
     },
     views: {
       'app': {
@@ -66,6 +79,9 @@ angular.module(module.exports, [
   })
   .state('app.game', {
     url: '/game',
+    resolve: {
+      pageTitle: setPageTitle('Join game')
+    },
     views: {
       'app@': {
         controller: 'HomeCtrl as home',
@@ -77,7 +93,16 @@ angular.module(module.exports, [
     url: '/view/:gameId',
     resolve: {
       currentUser: currentUser,
-      game: game
+      game: game,
+      pageTitle: [
+        '$pageTitle',
+        '$q',
+        'game',
+        function ($pageTitle, $q, game) {
+          $pageTitle.set(game.name);
+          return $q.resolve(game.name);
+        }
+      ]
     },
     views: {
       'app@': {
@@ -134,6 +159,9 @@ angular.module(module.exports, [
   })
   .state('app.game.new', {
     url: '/new',
+    resolve: {
+      pageTitle: setPageTitle('New game')
+    },
     views: {
       'app@': {
         controller: 'NewCtrl as new',

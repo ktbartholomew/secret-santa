@@ -8,6 +8,7 @@ angular.module('app', [
   'checklist-model',
   require('./routers'),
   require('./services/facebook'),
+  require('./services/page-title'),
   require('./home/home'),
   require('./login/login'),
   require('./new'),
