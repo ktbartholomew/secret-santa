@@ -1,0 +1,21 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: santa
+  namespace: santa
+  labels:
+    app: santa
+  annotations:
+    kubernetes.io/tls-acme: "true"
+spec:
+  tls:
+  - secretName: santa-tls
+    hosts:
+    - santa.keithbartholomew.com
+  rules:
+  - host: santa.keithbartholomew.com
+    http:
+      paths:
+      - backend:
+          serviceName: santa-frontend
+          servicePort: 80

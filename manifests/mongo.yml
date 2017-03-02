@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: gluster-endpoints
+  namespace: santa
+subsets:
+- addresses:
+  - ip: 10.132.65.67
+  ports:
+  - port: 1
+- addresses:
+  - ip: 10.132.72.132
+  ports:
+  - port: 1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo
+  namespace: santa
+spec:
+  selector:
+    app: santa
+    role: storage
+  ports:
+  - protocol: TCP
+    port: 27017
+    targetPort: 27017
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: mongo
+  namespace: santa
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: santa
+        role: storage
+    spec:
+      containers:
+      - name: mongo
+        image: mongo:3.4
+        ports:
+        - name: mongo
+          containerPort: 27017
+        volumeMounts:
+        - name: dbdata
+          mountPath: /data/db
+      volumes:
+      - name: dbdata
+        glusterfs:
+          path: gv0
+          endpoints: gluster-endpoints
