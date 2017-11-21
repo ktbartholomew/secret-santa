@@ -30,6 +30,13 @@ spec:
       - name: santa
         image: quay.io/ktbartholomew/secret-santa:latest
         env:
+        - name: MONGO_USER
+          value: santa
+        - name: MONGO_PASS
+          valueFrom:
+            secretKeyRef:
+              name: mongo
+              key: mongo_pass
         - name: MONGO_HOST
           value: mongo.santa.svc.cluster.local
         - name: MONGO_PORT
