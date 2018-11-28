@@ -10,5 +10,5 @@ docker run \
 -e MONGO_PASS=${MONGO_PASS} \
 -e MONGO_DB=${MONGO_DB} \
 -e FACEBOOK_APP_ID=${FACEBOOK_APP_ID} \
--p 3001:3000 \
+-p 3000:3000 \
 secret-santa
