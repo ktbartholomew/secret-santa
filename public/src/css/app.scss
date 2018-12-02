@@ -1,14 +1,15 @@
-@import "bourbon/app/assets/stylesheets/_bourbon";
-@import "variables";
+@import 'bourbon/app/assets/stylesheets/_bourbon';
+@import 'variables';
 
-@import "body";
+@import 'body';
 
-@import "components/buttons";
-@import "components/loading-message";
-@import "components/navbar";
-@import "components/panels";
+@import 'components/buttons';
+@import 'components/loading-message';
+@import 'components/navbar';
+@import 'components/panels';
 
-@import "login/login";
-@import "home/home";
-@import "new/new";
-@import "edit/edit";
+@import 'login/login';
+@import 'home/home';
+@import 'new/new';
+@import 'game/game';
+@import 'edit/edit';

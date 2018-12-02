@@ -1,0 +1,9 @@
+h1.title {
+  margin-top: 0;
+}
+
+@media (max-width: 768px) {
+  .game.closed .participants {
+    display: none;
+  }
+}

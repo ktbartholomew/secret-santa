@@ -44,22 +44,26 @@ angular.module(moduleName, []).provider('$facebook', [
 
             return this.isLoggedIn().then(function(status) {
               return $q(function(resolve, reject) {
-                FB.api('/me', {fields: 'first_name,name,picture'}, function(
-                  me
-                ) {
-                  currentUser = me;
-                  resolve(me);
-                });
+                FB.api(
+                  '/me',
+                  {fields: 'first_name,name,picture.height(320)'},
+                  function(me) {
+                    currentUser = me;
+                    resolve(me);
+                  }
+                );
               });
             });
           },
           getUser: function(id) {
             return $q(function(resolve, reject) {
-              FB.api('/' + id, {fields: 'first_name,name,picture'}, function(
-                user
-              ) {
-                resolve(user);
-              });
+              FB.api(
+                '/' + id,
+                {fields: 'first_name,name,picture.height(320)'},
+                function(user) {
+                  resolve(user);
+                }
+              );
             });
           },
           getPicture: function(userId, type) {
