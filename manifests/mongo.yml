@@ -8,16 +8,21 @@ spec:
     app: santa
     role: storage
   ports:
-  - protocol: TCP
-    port: 27017
-    targetPort: 27017
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017
 ---
-apiVersion: extensions/v1beta1
-kind: Deployment
+apiVersion: apps/v1
+kind: StatefulSet
 metadata:
   name: mongo
   namespace: santa
 spec:
+  serviceName: mongo
+  selector:
+    matchLabels:
+      app: santa
+      role: storage
   replicas: 1
   template:
     metadata:
@@ -26,15 +31,22 @@ spec:
         role: storage
     spec:
       containers:
-      - name: mongo
-        image: mongo:3.4
-        ports:
         - name: mongo
-          containerPort: 27017
-        volumeMounts:
-        - name: dbdata
-          mountPath: /data/db
+          image: mongo:4.0.4
+          command:
+            - mongod
+            - --auth
+            - --port
+            - '27017'
+            - --bind_ip
+            - '0.0.0.0'
+          ports:
+            - name: mongo
+              containerPort: 27017
+          volumeMounts:
+            - name: dbdata
+              mountPath: /data/db
       volumes:
-      - name: dbdata
-        hostPath:
-          path: /mnt/gv0/santa/mongo/data/db
+        - name: dbdata
+          persistentVolumeClaim:
+            claimName: mongo-data

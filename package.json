@@ -4,7 +4,7 @@
   "description": "An app for randomly generating secret santa pairings",
   "main": "Gruntfile.js",
   "scripts": {
-    "test": "exit 0;",
+    "test": "grunt build",
     "start": "grunt build && node index.js"
   },
   "repository": {
@@ -18,9 +18,10 @@
   },
   "homepage": "https://github.com/ktbartholomew/secret-santa#readme",
   "dependencies": {
-    "angular": "^1.4.7",
+    "acorn": "^6.0.4",
+    "angular": "^1.6.0",
     "angular-cookies": "^1.4.7",
-    "angular-ui-router": "^0.2.15",
+    "angular-ui-router": "0.3.2",
     "body-parser": "^1.14.1",
     "bourbon": "^4.2.6",
     "checklist-model": "^0.6.0",

@@ -1,10 +1,12 @@
 <div class="navbar navbar-default">
   <div class="container-fluid">
-    <span class="navbar-brand">Secret Santa</span>
-    <ul class="nav navbar-nav navbar-right">
+    <ul class="nav navbar-nav navbar-left">
+      <li><span class="navbar-brand">Secret Santa</span></li>
+    </ul>
+    <ul class="nav navbar-nav navbar-right user-info">
       <li>
-        <img data-ng-src="{{ navbar.picture }}">
-        <span class="navbar-text">{{ navbar.name }}</span>
+        <img class="user-picture" height=50" data-ng-src="{{ navbar.picture }}"
+        /> <span class="navbar-text">{{ navbar.name }}</span>
       </li>
     </ul>
   </div>
