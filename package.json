@@ -19,7 +19,7 @@
   "homepage": "https://github.com/ktbartholomew/secret-santa#readme",
   "dependencies": {
     "acorn": "^6.0.4",
-    "angular": "^1.6.0",
+    "angular": "^1.7.9",
     "angular-cookies": "^1.4.7",
     "angular-ui-router": "0.3.2",
     "body-parser": "^1.14.1",
