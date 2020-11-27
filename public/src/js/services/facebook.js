@@ -5,9 +5,17 @@ module.exports = moduleName;
 
 angular.module(moduleName, []).provider('$facebook', [
   function() {
+    var options = {};
+    var loginStatus;
     var currentUser;
 
     var FB = window.FB;
+
+    if (typeof FB.getLoginStatus === 'function') {
+      FB.getLoginStatus(function(status) {
+        loginStatus = status;
+      });
+    }
 
     this.$get = [
       '$q',
