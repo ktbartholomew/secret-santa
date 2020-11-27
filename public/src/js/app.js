@@ -15,7 +15,7 @@ angular.module('app', [
   require('./view/view')
 ]);
 
-window.fbAsyncInit = () => {
+window.fbAsyncInit = function() {
   window.FB.init({
     appId: process.env.FACEBOOK_APP_ID,
     cookie: true,
