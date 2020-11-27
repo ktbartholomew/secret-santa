@@ -21,6 +21,7 @@ window.fbAsyncInit = function() {
     cookie: true,
     version: 'v9.0'
   });
+
+  angular.bootstrap(document, ['app']);
 }
 
-angular.bootstrap(document, ['app']);
