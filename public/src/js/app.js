@@ -15,10 +15,12 @@ angular.module('app', [
   require('./view/view')
 ]);
 
-window.FB.init({
-  appId: process.env.FACEBOOK_APP_ID,
-  cookie: true,
-  version: 'v3.2'
-});
+window.fbAsyncInit = () => {
+  window.FB.init({
+    appId: process.env.FACEBOOK_APP_ID,
+    cookie: true,
+    version: 'v3.2'
+  });
+}
 
 angular.bootstrap(document, ['app']);

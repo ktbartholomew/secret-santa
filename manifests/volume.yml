@@ -1,25 +1,4 @@
 apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: mongo-data
-spec:
-  accessModes:
-    - ReadWriteOnce
-  capacity:
-    storage: 500Mi
-  storageClassName: local-storage
-  local:
-    path: /mnt/local/mongo-data
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-        - matchExpressions:
-            - key: kubernetes.io/hostname
-              operator: In
-              values:
-                - kubernetes-worker-01
----
-apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: mongo-data
@@ -29,6 +8,5 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 500Mi
-  storageClassName: local-storage
-  volumeName: mongo-data
+      storage: 1Gi
+  storageClassName: do-block-storage
