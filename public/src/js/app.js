@@ -19,7 +19,7 @@ window.fbAsyncInit = function() {
   window.FB.init({
     appId: process.env.FACEBOOK_APP_ID,
     cookie: true,
-    version: 'v3.2'
+    version: 'v9.0'
   });
 }
 
