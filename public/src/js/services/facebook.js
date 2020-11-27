@@ -21,6 +21,10 @@ angular.module(moduleName, []).provider('$facebook', [
         return {
           isLoggedIn: function() {
             return $q(function(resolve, reject) {
+              if (typeof FB.getLoginStatus !== 'function') {
+                return reject();
+              }
+
               FB.getLoginStatus(function(status) {
                 if (status.status === 'connected') {
                   resolve(status);
@@ -32,6 +36,10 @@ angular.module(moduleName, []).provider('$facebook', [
           },
           getLoginStatus: function() {
             return $q(function(resolve, reject) {
+              if (typeof FB.getLoginStatus !== 'function') {
+                return reject();
+              }
+
               FB.getLoginStatus(function(status) {
                 resolve(status);
               });
