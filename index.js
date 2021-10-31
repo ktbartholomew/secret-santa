@@ -372,7 +372,7 @@ app.put('/api/games/:gameId/join', function(req, res) {
     });
 });
 
-app.get(['/', '/login*', '/game*'], function(req, res, next) {
+app.get(['/', '/game*', '/login*', '/privacy*'], function(req, res, next) {
   log.info(util.format('[%s] %s %s', new Date().toJSON(), req.method, req.url));
   // Just send the index.html for other files to support HTML5Mode
   res.sendFile(__dirname + '/public/index.html');

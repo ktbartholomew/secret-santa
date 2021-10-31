@@ -1,3 +1,5 @@
+const sass = require('node-sass');
+
 module.exports = function (grunt) {
   grunt.initConfig({
     browserify: {
@@ -51,6 +53,7 @@ module.exports = function (grunt) {
           'public/dist/css/app.css': ['public/src/css/app.scss']
         },
         options: {
+          implementation: sass,
           outputStyle: 'compressed',
           includePaths: [
             'node_modules'

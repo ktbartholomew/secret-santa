@@ -220,6 +220,17 @@ angular.module(module.exports, [require('angular-ui-router')]).config([
             templateUrl: '/src/js/new/new.html'
           }
         }
+      })
+      .state('privacry', {
+        url: '/privacy',
+        resolve: {
+          pageTitle: setPageTitle('Privacy Policy')
+        },
+        views: {
+          'app@': {
+            templateUrl: '/src/js/privacy/index.html'
+          }
+        }
       });
   }
 ]);
