@@ -32,7 +32,7 @@ spec:
     spec:
       containers:
       - name: santa
-        image: quay.io/ktbartholomew/secret-santa:a6086aef94286f6c040497fab647ac77919d0cac
+        image: quay.io/ktbartholomew/secret-santa:9e7bbbf3267373a9e8562c601731fa9b1a0fec49
         env:
         - name: MONGO_USER
           value: santa
