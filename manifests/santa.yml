@@ -32,7 +32,7 @@ spec:
     spec:
       containers:
       - name: santa
-        image: quay.io/ktbartholomew/secret-santa:34972324da611e5968d26c147d6155cb65ee9c6c
+        image: quay.io/ktbartholomew/secret-santa:a6086aef94286f6c040497fab647ac77919d0cac
         env:
         - name: MONGO_USER
           value: santa
@@ -52,3 +52,7 @@ spec:
         ports:
         - name: http
           containerPort: 3000
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 256Mi
