@@ -1,13 +1,13 @@
-FROM node:16.13.0
-ENV NPM_CONFIG_LOGLEVEL=warn
+FROM node:18 as build
+
 WORKDIR /usr/src/app
 EXPOSE 3000
 
-RUN npm install -g grunt-cli
 COPY package.json package.json
 COPY package-lock.json package-lock.json
-
-RUN npm ci --production
+RUN npm ci
 
 COPY . /usr/src/app/
+RUN npm run build
+
 CMD npm start
