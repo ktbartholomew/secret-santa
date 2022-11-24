@@ -63,7 +63,7 @@ export const getServerSideProps: GetServerSideProps = async function ({
     games = await listGamesForUser(user);
   } catch (e) {
     console.warn(e);
-    redirectToLogin(res);
+    redirectToLogin(req, res);
     return { props: {} };
   }
 

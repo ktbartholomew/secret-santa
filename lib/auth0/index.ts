@@ -61,11 +61,16 @@ async function exchangeCode(code: string): Promise<string> {
   return j.id_token;
 }
 
-function redirectToLogin(res: ServerResponse<IncomingMessage>) {
+function redirectToLogin(
+  req: IncomingMessage,
+  res: ServerResponse<IncomingMessage>
+) {
   const params = new URLSearchParams({
     response_type: "code",
     client_id: AUTH0_CLIENT_ID,
-    redirect_uri: `${SELF_URL}/api/authCallback`,
+    redirect_uri: `${SELF_URL}/api/authCallback?return_to=${encodeURIComponent(
+      req.url
+    )}`,
     scope: "openid profile",
   });
 

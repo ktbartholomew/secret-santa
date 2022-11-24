@@ -24,7 +24,10 @@ const handler: NextApiHandler = async (req, res) => {
       `auth0_id_token=${encodeURIComponent(idToken)}; path=/; HttpOnly; Secure;`
     );
     res.status(302);
-    res.setHeader("location", created ? "/preferences" : "/");
+    res.setHeader(
+      "location",
+      created ? "/preferences" : req.query.return_to || "/"
+    );
     res.end();
   } catch (e) {
     console.error(e);

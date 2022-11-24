@@ -64,7 +64,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   try {
     user = await getUserFromCookies(req.cookies);
   } catch (e) {
-    redirectToLogin(res);
+    redirectToLogin(req, res);
     return { props: {} };
   }
 
