@@ -4,3 +4,4 @@ proxy
 scripts
 .env
 .next
+dist
