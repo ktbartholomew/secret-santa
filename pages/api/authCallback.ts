@@ -8,7 +8,7 @@ const handler: NextApiHandler = async (req, res) => {
     const idToken = await exchangeCode(req.query.code as string);
     const parsedToken = await verify(idToken);
 
-    const user = await upsertUser({
+    const { user, created } = await upsertUser({
       sub: parsedToken.sub,
       name: parsedToken.name,
     });
@@ -24,7 +24,7 @@ const handler: NextApiHandler = async (req, res) => {
       `auth0_id_token=${encodeURIComponent(idToken)}; path=/; HttpOnly; Secure;`
     );
     res.status(302);
-    res.setHeader("location", "/");
+    res.setHeader("location", created ? "/preferences" : "/");
     res.end();
   } catch (e) {
     console.error(e);

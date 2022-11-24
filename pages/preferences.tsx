@@ -12,7 +12,8 @@ export default function UserPreferencesPage({ user }: { user: User }) {
   async function saveChanges(e) {
     e.preventDefault();
 
-    const displayNameInput: HTMLSelectElement = form.current.display_name;
+    const displayNameInput: HTMLInputElement = form.current.display_name;
+    const phoneInput: HTMLInputElement = form.current.phone_number;
 
     const resp = await fetch(`/api/preferences`, {
       method: "POST",
@@ -21,6 +22,9 @@ export default function UserPreferencesPage({ user }: { user: User }) {
       },
       body: JSON.stringify({
         name: displayNameInput.value,
+        preferences: {
+          smsPhone: phoneInput.value,
+        },
       }),
     });
 
@@ -40,17 +44,35 @@ export default function UserPreferencesPage({ user }: { user: User }) {
         </div>
         <div className="mt-5">
           <label htmlFor="display_name" className="block text-sm">
-            Display Name
+            Display Name<span className="text-red-700">*</span>
           </label>
           <input
             type="text"
             className="w-full"
             name="display_name"
             id="display_name"
+            required
             defaultValue={user.name}
           />
           <div className="text-xs text-gray-500 mt-1">
             Your display name is shown to other players.
+          </div>
+        </div>
+        <div className="mt-5">
+          <label htmlFor="phone_number" className="block text-sm">
+            SMS Phone Number
+          </label>
+          <input
+            type="tel"
+            className="w-full"
+            name="phone_number"
+            id="phone_number"
+            defaultValue={user.preferences.smsPhone}
+          />
+          <div className="text-xs text-gray-500 mt-1">
+            We’ll use this to notify you when Secret Santas are assigned or when
+            your assignee updates their likes and dislikes. Standard messaging
+            rates apply.
           </div>
         </div>
         <div className="mt-5">

@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { getUserFromCookies } from "../../lib/auth0";
-import { setUserName } from "../../lib/user";
+import { setPreferences, setUserName } from "../../lib/user";
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   if (!req.body.name) {
@@ -12,6 +12,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   try {
     const user = await getUserFromCookies(req.cookies);
     await setUserName(user.id, req.body.name);
+    await setPreferences(user.id, req.body.preferences);
+
     res.status(202);
     res.end();
   } catch (e) {
