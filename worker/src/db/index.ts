@@ -1,12 +1,15 @@
 import mysql from "mysql2/promise";
 
-let conn;
+let conn: mysql.Connection;
 
-try {
-  conn = mysql.createConnection(process.env.DATABASE_CONNECTION_STRING);
-} catch (e) {
-  console.warn(e);
-}
+mysql
+  .createConnection(process.env.DATABASE_CONNECTION_STRING)
+  .then((c) => {
+    conn = c;
+  })
+  .catch((e) => {
+    console.warn(e);
+  });
 
 export async function getConnection(): Promise<mysql.Connection> {
   return conn;
