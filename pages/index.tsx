@@ -17,9 +17,12 @@ function IndexPage({ user, games }: IndexPageProps) {
         <div>
           <div className="p-2 font-bold">
             Hey, {user.name}!{" "}
-            <a className="text-xs text-blue-600 underline ml-2" href="#">
+            <Link
+              href="/preferences"
+              className="text-xs text-blue-600 underline ml-2"
+            >
               Change
-            </a>
+            </Link>
           </div>
         </div>
         <div>

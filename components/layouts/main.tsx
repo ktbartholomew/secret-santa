@@ -11,27 +11,31 @@ export default function MainLayout({
   return (
     <>
       <div className="flex justify-end mb-2">
-        <button className="text-slate-300 py-3 px-4 bg-transparent hover:bg-slate-700 transition-color rounded-md">
-          Preferences
-        </button>
+        <Link href="/preferences">
+          <button className="text-slate-300 py-3 px-4 bg-transparent hover:bg-slate-700 transition-colors rounded-md">
+            Preferences
+          </button>
+        </Link>
         <a href="/logout">
-          <button className="text-slate-300 py-3 px-4 bg-transparent hover:bg-slate-700 rounded-md">
+          <button className="text-slate-300 py-3 px-4 bg-transparent hover:bg-slate-700 transition-colors rounded-md">
             Log Out
           </button>
         </a>
       </div>
       <div className="max-w-3xl flex flex-wrap flex-row mx-auto justify-center">
         <div className="basis-full flex-grow text-center">
-          <h1 className="hidden">Secret Santa</h1>
-          <Image
-            {...stamp}
-            alt="Secret Santa Logo"
-            width={stamp.width / 2}
-            height={stamp.height / 2}
-            className="block mx-auto"
-            style={{ transform: "rotate(6deg)" }}
-            priority
-          />
+          <Link href="/">
+            <h1 className="hidden">Secret Santa</h1>
+            <Image
+              {...stamp}
+              alt="Secret Santa Logo"
+              width={stamp.width / 2}
+              height={stamp.height / 2}
+              className="block mx-auto"
+              style={{ transform: "rotate(6deg)" }}
+              priority
+            />
+          </Link>
         </div>
         <div className="my-8 basis-full flex-grow bg-white drop-shadow-lg rounded-lg">
           {children}

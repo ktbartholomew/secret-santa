@@ -59,3 +59,12 @@ export async function getUserById(userId: number): Promise<User> {
 
   return rows[0];
 }
+
+export async function setUserName(userId: number, name: string): Promise<void> {
+  const conn = await getConnection();
+
+  return conn.query(`UPDATE users SET name = ? WHERE id = ? LIMIT 1`, [
+    name,
+    userId,
+  ]);
+}

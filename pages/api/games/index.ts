@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { getUserFromCookies } from "../../../lib/auth0";
-import { createGame, Game } from "../../../lib/games";
-import { User } from "../../../lib/user";
+import { createGame } from "../../../lib/games";
 
 const adjectives = [
   "abundant",
