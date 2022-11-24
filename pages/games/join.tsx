@@ -33,7 +33,7 @@ export default function JoinPage({
   };
 
   if (serverErrorMessage) {
-    return <div className="p-5">serverErrorMessage</div>;
+    return <div className="p-5">{serverErrorMessage}</div>;
   }
 
   return (

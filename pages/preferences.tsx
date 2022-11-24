@@ -33,7 +33,7 @@ export default function UserPreferencesPage({ user }: { user: User }) {
       return;
     }
 
-    router.push("/");
+    router.push((router.query.return_to as string) || "/");
   }
 
   return (

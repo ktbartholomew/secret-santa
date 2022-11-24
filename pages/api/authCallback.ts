@@ -26,7 +26,10 @@ const handler: NextApiHandler = async (req, res) => {
     res.status(302);
     res.setHeader(
       "location",
-      created ? "/preferences" : req.query.return_to || "/"
+      created
+        ? "/preferences?return_to=" +
+            encodeURIComponent((req.query.return_to as string) || "/")
+        : req.query.return_to || "/"
     );
     res.end();
   } catch (e) {
