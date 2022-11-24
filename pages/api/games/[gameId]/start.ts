@@ -1,7 +1,11 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { getUserFromCookies } from "../../../../lib/auth0";
 import { getConnection } from "../../../../lib/db";
-import { getGameById, UserGameRow } from "../../../../lib/games";
+import {
+  getGameById,
+  notifyUserOfAssignment,
+  UserGameRow,
+} from "../../../../lib/games";
 import { setAssignees } from "../../../../lib/games/shuffle";
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
@@ -39,6 +43,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         `UPDATE user_games SET assignee = ? WHERE id = ? LIMIT 1`,
         [a.assignee, a.id]
       );
+
+      notifyUserOfAssignment(a.user_id, a.assignee);
     }
 
     await conn.query(`UPDATE games SET join_key = NULL WHERE id = ? LIMIT 1`, [

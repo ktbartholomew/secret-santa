@@ -14,10 +14,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     return;
   }
 
-  await conn.query(`INSERT INTO user_games(user_id, game_id) VALUES(?, ?)`, [
-    user.id,
-    game.id,
-  ]);
+  await conn.query(
+    `INSERT INTO user_games(user_id, game_id, exclusions) VALUES(?, ?, [])`,
+    [user.id, game.id]
+  );
 
   res.status(202);
   res.end();

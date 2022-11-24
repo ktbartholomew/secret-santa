@@ -1,6 +1,6 @@
 import { Connection, RowDataPacket } from "mysql2/promise";
 import { getConnection } from "../db";
-import { User } from "../user";
+import { getUserById, User } from "../user";
 
 export interface Assignee {
   name: string;
@@ -48,21 +48,50 @@ export type ListForUserInput = {
   id: number;
 };
 
+export async function notifyUserOfAssignment(
+  userId: number,
+  assigneeId: number
+) {
+  const conn = await getConnection();
+  const user = await getUserById(userId);
+  const assignee = await getUserById(assigneeId);
+
+  if (!user.preferences.smsPhone) {
+    return;
+  }
+
+  await conn.query(
+    `INSERT INTO tasks (expires_at, task)
+     VALUES(
+       DATE_ADD(NOW(), INTERVAL 20 MINUTE), ?
+     )`,
+    [
+      JSON.stringify({
+        type: "SEND_SMS",
+        data: {
+          recipient: user.preferences.smsPhone,
+          message: `SECRET SANTA: You're Secret Santa for ${assignee.name}! See their likes/dislikes on the website: https://bit.ly/3VsgYYa`,
+        },
+      }),
+    ]
+  );
+}
+
 export async function listGamesForUser(
   input: ListForUserInput
 ): Promise<UserGame[]> {
   const conn = await getConnection();
 
   const [rows] = (await conn.query(
-    `SELECT 
-      games.*, 
-      user_games.assignee, 
-      user_games.likes, 
+    `SELECT
+      games.*,
+      user_games.assignee,
+      user_games.likes,
       user_games.dislikes,
       user_games.creator
-    FROM games 
-    JOIN user_games ON games.id = user_games.game_id 
-    WHERE user_games.user_id = ? 
+    FROM games
+    JOIN user_games ON games.id = user_games.game_id
+    WHERE user_games.user_id = ?
     ORDER BY games.created_at DESC`,
     [input.id]
   )) as [UserGame[], any];
@@ -106,10 +135,10 @@ export async function getAssigneeById(
   const conn = await getConnection();
 
   const [rows] = (await conn.query(
-    `SELECT 
-      users.name, user_games.likes, user_games.dislikes 
-    FROM user_games 
-    JOIN users ON user_games.user_id = users.id 
+    `SELECT
+      users.name, user_games.likes, user_games.dislikes
+    FROM user_games
+    JOIN users ON user_games.user_id = users.id
     WHERE user_games.user_id = ? AND user_games.game_id = ? LIMIT 1`,
     [userId, gameId]
   )) as [Assignee[], any];
@@ -124,13 +153,13 @@ export async function getGameById(
   const conn = await getConnection();
 
   const [results] = (await conn.query(
-    `SELECT 
-      games.*, 
-      user_games.assignee, 
-      user_games.likes, 
+    `SELECT
+      games.*,
+      user_games.assignee,
+      user_games.likes,
       user_games.dislikes,
       user_games.creator
-    FROM games 
+    FROM games
     JOIN user_games ON games.id = user_games.game_id WHERE user_games.user_id = ? AND games.id = ? LIMIT 1`,
     [userId, gameId]
   )) as [UserGame[], any];
@@ -141,9 +170,9 @@ export async function getGameById(
 export async function listPlayersInGame(gameId: number): Promise<UserGame[]> {
   const conn = await getConnection();
   const [rows] = (await conn.query(
-    `SELECT 
-      users.id, users.name, user_games.exclusions, user_games.creator 
-    FROM users 
+    `SELECT
+      users.id, users.name, user_games.exclusions, user_games.creator
+    FROM users
     JOIN user_games ON users.id = user_games.user_id
     WHERE user_games.game_id = ?`,
     [gameId]
