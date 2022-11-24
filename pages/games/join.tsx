@@ -3,7 +3,12 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import Button from "../../components/button";
 import { getUserFromCookies, redirectToLogin } from "../../lib/auth0";
-import { findGameWithJoinKey, Game } from "../../lib/games";
+import {
+  findGameWithJoinKey,
+  Game,
+  getGameById,
+  listPlayersInGame,
+} from "../../lib/games";
 import { User } from "../../lib/user";
 
 export default function JoinPage({
@@ -69,6 +74,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   }
 
   const joinKey = query.join_key as string;
+
   const game = await findGameWithJoinKey(joinKey || "");
 
   if (!game) {
@@ -78,6 +84,12 @@ export const getServerSideProps: GetServerSideProps = async ({
           "Unable to find a matching game. It may no longer be open for new people to join.",
       },
     };
+  }
+
+  const players = await listPlayersInGame(game.id);
+  if (players.filter((p) => p.id === user.id).length > 0) {
+    res.statusCode = 302;
+    res.setHeader("location", `/games/${game.id}`);
   }
 
   const createdAt = game.created_at as Date;
