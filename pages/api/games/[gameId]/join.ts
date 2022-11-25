@@ -15,7 +15,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   }
 
   await conn.query(
-    `INSERT INTO user_games(user_id, game_id, exclusions) VALUES(?, ?, [])`,
+    `INSERT INTO user_games(user_id, game_id, exclusions) VALUES(?, ?, '[]')`,
     [user.id, game.id]
   );
 
