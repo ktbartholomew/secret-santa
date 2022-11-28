@@ -1,16 +1,21 @@
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Button from "../../components/button";
 import { Game } from "../../lib/games";
 
 function CreatedGame({ game }: { game: Game }) {
+  const [origin, setOrigin] = useState("");
+  useEffect(() => {
+    setOrigin(window.location.origin);
+  }, []);
+
   return (
     <div className="prose">
       <h2>Your game has been created!</h2>
 
       <p>Invite your friends to join this game by sharing this link:</p>
       <pre>
-        https://localhost:8443/games/join?join_key=
+        https://{origin}/games/{game.id}?join_key=
         {encodeURIComponent(game.join_key)}
       </pre>
       <p>
