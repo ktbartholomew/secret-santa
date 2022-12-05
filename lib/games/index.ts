@@ -3,6 +3,7 @@ import { getConnection } from "../db";
 import { getUserById, User } from "../user";
 
 export interface Assignee {
+  id: number;
   name: string;
   likes: string;
   dislikes: string;
@@ -77,6 +78,29 @@ export async function notifyUserOfAssignment(
   );
 }
 
+export async function notifyOfUserLikes(userId: number, assigneeId: number) {
+  const conn = await getConnection();
+  const user = await getUserById(userId);
+  const assignee = await getUserById(assigneeId);
+
+  if (!assignee.preferences.smsPhone) {
+    return;
+  }
+
+  await conn.query(
+    `INSERT INTO tasks(expires_at, task) VALUES(DATE_ADD(NOW(), INTERVAL 20 MINUTE), ? )`,
+    [
+      JSON.stringify({
+        type: "SEND_SMS",
+        data: {
+          recipient: assignee.preferences.smsPhone,
+          message: `SECRET SANTA: ${user.name} has updated their likes/dislikes. See them on the website: https://bit.ly/3VsgYYa`,
+        },
+      }),
+    ]
+  );
+}
+
 export async function listGamesForUser(
   input: ListForUserInput
 ): Promise<UserGame[]> {
@@ -136,7 +160,7 @@ export async function getAssigneeById(
 
   const [rows] = (await conn.query(
     `SELECT
-      users.name, user_games.likes, user_games.dislikes
+      users.id, users.name, user_games.likes, user_games.dislikes
     FROM user_games
     JOIN users ON user_games.user_id = users.id
     WHERE user_games.user_id = ? AND user_games.game_id = ? LIMIT 1`,
