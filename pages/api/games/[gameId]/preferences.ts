@@ -12,12 +12,14 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     [req.body.likes, req.body.dislikes, user.id, req.query.gameId]
   );
 
-  const rows = (await conn.query(
+  const [rows] = (await conn.query(
     `SELECT assignee FROM user_games WHERE user_id = ? AND game_id = ?`,
     [user.id, req.query.gameId]
-  )) as [{ assignee: number }];
+  )) as [{ assignee: number }[], any];
 
-  notifyOfUserLikes(user.id, rows[0].assignee);
+  if (rows.length > 0 && rows[0].assignee) {
+    notifyOfUserLikes(user.id, rows[0].assignee);
+  }
 
   res.status(202);
   res.end();
